@@ -16,7 +16,7 @@ namespace TicTacToe.Game._3x3
 
         public Step(int x, int y, IPlayer player)
         {
-            if (!IsIndexCorrect(X))
+            if (!IsIndexCorrect(x))
                 throw new ArgumentOutOfRangeException("x");
 
             if (!IsIndexCorrect(y))
@@ -28,6 +28,11 @@ namespace TicTacToe.Game._3x3
             X = x;
             Y = y;
             Player = player;
+        }
+
+        public Step(Cell cell, IPlayer player) : this(cell.X, cell.Y, player)
+        {
+            
         }
 
         private bool IsIndexCorrect(int index)

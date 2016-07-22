@@ -21,6 +21,7 @@ namespace TicTacToe.Game.Rules
         int YCellsCount { get; }
 
         StepType? this[int x, int y] { get; }
+        IEnumerable<Cell> EmptyCells { get; } 
 
         #region Events
 

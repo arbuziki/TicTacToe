@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using TicTacToe.Game.Rules;
+using TicTacToe.Game._3x3;
 
 namespace TicTacToe.Client.Cmd.Wrappers
 {
@@ -21,8 +22,8 @@ namespace TicTacToe.Client.Cmd.Wrappers
             if (gameManager == null)
                 throw new ArgumentNullException("gameManager");
 
-            var player1 = new UserPlayer("Player 1", StepType.X);
-            var player2 = new UserPlayer("Player 2", StepType.O);
+            var player1 = new Bot("Бот", StepType.X);
+            var player2 = new UserPlayer("Человек", StepType.O);
 
             _game = gameManager.BeginGame(new IPlayer[] {player1, player2});
 

@@ -7,6 +7,8 @@ namespace TicTacToe.Client.Cmd.Wrappers
 {
     public class UserPlayer : IPlayer
     {
+        private IGame _game;
+
         public string Name { get; private set; }
         public StepType StepType { get; private set; }
 
@@ -17,6 +19,11 @@ namespace TicTacToe.Client.Cmd.Wrappers
 
             Name = name;
             StepType = stepType;
+        }
+
+        public void BeginGame(IGame game)
+        {
+            _game = game;
         }
 
         public IStep MakeStep()

@@ -6,6 +6,7 @@
 
         StepType StepType { get; }
 
+        void BeginGame(IGame game);
         IStep MakeStep();
     }
 }

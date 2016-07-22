@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading;
@@ -37,6 +38,11 @@ namespace TicTacToe.Game._3x3
 
         public bool IsRunning { get; private set; }
 
+        public int StepsCount
+        {
+            get { return _history.Count; }
+        }
+
         #endregion
 
 
@@ -58,11 +64,12 @@ namespace TicTacToe.Game._3x3
             if (players.Count() != 2)
                 throw new Exception("Игра расчитана на 2-х игроков.");
 
-            _players = new List<IPlayer>(players);
-
             _field = new Field(3, 3);
 
             _random = new Random();
+
+            _players = new List<IPlayer>(players);
+            _players.ForEach(T => T.BeginGame(this));
         }
 
         public void StartGame()
@@ -87,7 +94,7 @@ namespace TicTacToe.Game._3x3
 
         private void GameBody()
         {
-            var currentPlayer = Players[_random.Next(0, Players.Count())];
+            var currentPlayer = Players.First(T => T.StepType == StepType.X);
 
             while (IsRunning)
             {
@@ -97,7 +104,15 @@ namespace TicTacToe.Game._3x3
 
                 while (true)
                 {
+                    try
+                    {
                     step = currentPlayer.MakeStep();
+                    }
+                    catch (Exception e)
+                    {
+                        //Если алгоритм расчета ходов начинает тупить, то делаем случайный ход.
+                        step = MakeRandomStep(currentPlayer);
+                    }
 
                     var msg = GetCorrectString(step);
 
@@ -193,6 +208,17 @@ namespace TicTacToe.Game._3x3
             return null;
         }
 
+        private IStep MakeRandomStep(IPlayer player)
+        {
+            var emptyCells = _field.EmptyCells.ToArray();
+
+            var randomCell =  emptyCells[_random.Next(0, emptyCells.Count())];
+
+            return new Step(randomCell.X, randomCell.Y, player);
+        }
+
+        #region RaiseEventsRegion
+
         private void RaisePlayerGoingMakeStepEvent(IPlayer player)
         {
             var callback = Interlocked.CompareExchange(ref OnPlayerGoingMakeStep, null, null);
@@ -232,5 +258,7 @@ namespace TicTacToe.Game._3x3
                 callback(player);
             }
         }
+
+        #endregion
     }
 }
