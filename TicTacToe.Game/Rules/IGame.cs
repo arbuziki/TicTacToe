@@ -20,6 +20,8 @@ namespace TicTacToe.Game.Rules
         /// </summary>
         ICollection<IStep> History { get; }
 
+        int StepsCount { get; }
+
         bool IsRunning { get; }
 
         #region Events
