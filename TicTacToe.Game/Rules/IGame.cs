@@ -5,7 +5,8 @@ namespace TicTacToe.Game.Rules
     public delegate void PlayerGoingMakeStepDelegate(IPlayer player);
     public delegate void PlayerStepErrorDelegate(string message);
     public delegate void PlayerMakedStepDelegate(IStep step);
-    public delegate void GameOverDelegate(IPlayer winner);
+    public delegate void GameOverDelegate(bool isDraw, IPlayer winner);
+    
 
     /// <summary>
     /// Описывает правила игры.

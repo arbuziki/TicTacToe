@@ -139,6 +139,13 @@ namespace TicTacToe.Game._3x3
                     break;
                 }
 
+                if (_history.Count == 9)
+                {
+                    RaiseGameOverEvent(null);
+                    break;
+                }
+                    
+
                 currentPlayer = Players.Single(T => T != currentPlayer);
             }
         }
@@ -255,7 +262,7 @@ namespace TicTacToe.Game._3x3
 
             if (callback != null)
             {
-                callback(player);
+                callback(player == null, player);
             }
         }
 

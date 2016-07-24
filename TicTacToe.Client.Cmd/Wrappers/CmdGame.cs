@@ -57,9 +57,16 @@ namespace TicTacToe.Client.Cmd.Wrappers
             Console.WriteLine(message);
         }
 
-        private void OnGameOver(IPlayer winner)
+        private void OnGameOver(bool isDraw, IPlayer winner)
         {
-            Console.WriteLine("Игра закончена. Выиграл: {0}.", winner.Name);
+            if (isDraw)
+            {
+                Console.WriteLine("Игра закончена. Ничья!");
+            }
+            else
+            {
+                Console.WriteLine("Игра закончена. Выиграл: {0}.", winner.Name); 
+            }
 
             _threadLocker.Set();
         }

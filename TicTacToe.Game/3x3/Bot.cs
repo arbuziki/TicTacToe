@@ -51,8 +51,14 @@ namespace TicTacToe.Game._3x3
         /// <returns></returns>
         private IStep ProcessX()
         {
+
+            IStep result = StepInWinCell();
+
+            if (result != null)
+                return result;
+
             //Сначала ходим в опасные ячейки (если они есть)
-            IStep result = StepInDangerCell();
+            result = StepInDangerCell();
 
             if (result != null)
                 return result;
@@ -81,18 +87,84 @@ namespace TicTacToe.Game._3x3
             throw new NotImplementedException();
         }
 
+        private IStep StepInWinCell()
+        {
+            var mySteps = _game.History.Where(T => T.Player.StepType == StepType).ToList();
+
+            var column = mySteps.GroupBy(T => T.X).FirstOrDefault(T => T.Count() == 2);
+
+            if (column != null)
+            {
+                int x = column.First().X;
+                int y = 3 - column.Sum(T => T.Y);
+
+                if (!_game.Field[x, y].HasValue)
+                    return new Step(x, y, this);
+            }
+
+            var row = mySteps.GroupBy(T => T.Y).FirstOrDefault(T => T.Count() == 2);
+
+            if (row != null)
+            {
+                int x = 3 - row.Sum(T => T.X);
+                int y = row.First().Y;
+
+                if (!_game.Field[x, y].HasValue)
+                    return new Step(x, y, this);
+            }
+
+            //Проверяем по диагонали
+
+            List<IStep> diag1 = new List<IStep>();
+            List<IStep> diag2 = new List<IStep>();
+
+            for (int i = 0; i < 2; i++)
+            {
+                var step = mySteps.FirstOrDefault(T => T.X == i && T.Y == i);
+
+                if (step != null)
+                    diag1.Add(step);
+
+                step = mySteps.FirstOrDefault(T => T.X == 2 - i && T.Y == i);
+
+                if (step != null)
+                    diag2.Add(step);
+            }
+
+            if (diag1.Count == 2)
+            {
+                int x = 3 - diag1.Sum(T => T.X);
+                int y = 3 - diag1.Sum(T => T.Y);
+
+                if (!_game.Field[x, y].HasValue)
+                    return new Step(x, y, this);
+            }
+
+            if (diag2.Count == 2)
+            {
+                int x = 3 - diag2.Sum(T => T.X);
+                int y = 3 - diag2.Sum(T => T.Y);
+
+                if (!_game.Field[x, y].HasValue)
+                    return new Step(x, y, this);
+            }
+
+            return null;
+        }
+
         private IStep StepInDangerCell()
         {
-            var enemySteps = _game.History.Where(T => T.Player.StepType != StepType);
+            var enemySteps = _game.History.Where(T => T.Player.StepType != StepType).ToList();
 
             var column = enemySteps.GroupBy(T => T.X).FirstOrDefault(T => T.Count() == 2);
 
             if (column != null)
             {
+                int x = column.First().X;
                 int y = 3 - column.Sum(T => T.Y);
 
-                if (!_game.Field[column.First().X,y].HasValue)
-                    return new Step(column.First().X, y, this);
+                if (!_game.Field[x, y].HasValue)
+                    return new Step(x, y, this);
             }
 
             var row = enemySteps.GroupBy(T => T.Y).FirstOrDefault(T => T.Count() == 2);
@@ -100,12 +172,47 @@ namespace TicTacToe.Game._3x3
             if (row != null)
             {
                 int x = 3 - row.Sum(T => T.X);
-                if (!_game.Field[x, row.First().Y].HasValue)
+                int y = row.First().Y;
 
-                return new Step(x, row.First().Y, this);
+                if (!_game.Field[x, y].HasValue)
+                    return new Step(x, y, this);
             }
 
-            
+            //Проверяем по диагонали
+
+            List<IStep> diag1 = new List<IStep>();
+            List<IStep> diag2 = new List<IStep>();
+
+            for (int i = 0; i < 2; i++)
+            {
+                var step = enemySteps.FirstOrDefault(T => T.X == i && T.Y == i);
+
+                if (step != null)
+                    diag1.Add(step);
+
+                step = enemySteps.FirstOrDefault(T => T.X == 2 - i && T.Y == i);
+
+                if (step != null)
+                    diag2.Add(step);
+            }
+
+            if (diag1.Count == 2)
+            {
+                int x = 3 - diag1.Sum(T => T.X);
+                int y = 3 - diag1.Sum(T => T.Y);
+
+                if (!_game.Field[x, y].HasValue)
+                    return new Step(x, y, this);
+            }
+
+            if (diag2.Count == 2)
+            {
+                int x = 3 - diag2.Sum(T => T.X);
+                int y = 3 - diag2.Sum(T => T.Y);
+
+                if (!_game.Field[x, y].HasValue)
+                    return new Step(x, y, this);
+            }
 
             return null;
         }
