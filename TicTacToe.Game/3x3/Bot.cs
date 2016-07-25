@@ -85,7 +85,12 @@ namespace TicTacToe.Game._3x3
                 throw new Exception("Нолики должны ходить вторыми.");
             }
 
-            return StepType == StepType.X && !_swapAlgorithm ? ProcessX() : ProcessO();
+            var result = StepType == StepType.X && !_swapAlgorithm ? ProcessX() : ProcessO();
+
+            if (result == null)
+                throw new Exception("Ход не был сделан.");
+
+            return result;
         }
 
         /// <summary>

@@ -113,7 +113,7 @@ namespace TicTacToe.Game._3x3
                 {
                     try
                     {
-                    step = currentPlayer.MakeStep();
+                        step = currentPlayer.MakeStep();
                     }
                     catch (Exception e)
                     {
@@ -142,6 +142,7 @@ namespace TicTacToe.Game._3x3
                 if (winner != null)
                 {
                     RaiseGameOverEvent(winner);
+                    ClearGame();
                     IsRunning = false;
                     break;
                 }
@@ -149,6 +150,7 @@ namespace TicTacToe.Game._3x3
                 if (_history.Count == 9)
                 {
                     RaiseGameOverEvent(null);
+                    ClearGame();
                     break;
                 }
                     
@@ -166,6 +168,11 @@ namespace TicTacToe.Game._3x3
                 return "В эту клетку уже был сделан ход.";
 
             return string.Empty;
+        }
+
+        private void ClearGame()
+        {
+            _players.ForEach(T => T.ClearGame());
         }
 
         private IPlayer GetWinner()

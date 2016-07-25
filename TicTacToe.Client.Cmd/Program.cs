@@ -15,7 +15,10 @@ namespace TicTacToe.Client.Cmd
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Запуск крестиков-ноликов");
+            Console.WriteLine("=========================================");
+            Console.WriteLine("               TIC TAC TOE");
+            Console.WriteLine("=========================================");
+            Console.WriteLine();
 
             CmdGame game = new CmdGame(new GameManager());
 

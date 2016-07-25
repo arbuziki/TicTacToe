@@ -44,6 +44,9 @@ namespace TicTacToe.Client.Cmd.Wrappers
             if (_players.Count != 2)
                 throw new Exception("Должно быть два игрока.");
 
+            Console.WriteLine("Начинаем игру.");
+            Console.WriteLine();
+
             Random rnd = new Random();
 
             var player1 = _players[rnd.Next(0, 2)];
@@ -52,8 +55,8 @@ namespace TicTacToe.Client.Cmd.Wrappers
             player1.StepType = StepType.X;
             player2.StepType = StepType.O;
 
-            Console.WriteLine("Игрок {0} играет за крестики.", player1.Name);
-            Console.WriteLine("Игрок {0} играет за нолики.", player2.Name);
+            Console.WriteLine("Игрок \"{0}\" играет за крестики.", player1.Name);
+            Console.WriteLine("Игрок \"{0}\" играет за нолики.", player2.Name);
 
             _game = _gameManager.BeginGame(new[] { player1, player2 });
 
@@ -63,7 +66,6 @@ namespace TicTacToe.Client.Cmd.Wrappers
             _game.OnPlayerStepError += OnPlayerStepError;
             _game.OnGameOver += OnGameOver;
 
-            Console.WriteLine("Начинаем игру.");
             Console.WriteLine();
 
             _cmdField.RedrawField();
@@ -72,6 +74,17 @@ namespace TicTacToe.Client.Cmd.Wrappers
             _game.StartGame();
 
             _threadLocker.WaitOne();
+
+            Console.Write("Сыграть еще? (y/n): ");
+            var result = Console.ReadKey();
+
+            if (result.KeyChar == 'y')
+            {
+                Console.Clear();
+                Run();
+            }
+            Console.WriteLine();
+               
         }
 
         private  void OnPlayerGiongMakeStep(IPlayer player)
