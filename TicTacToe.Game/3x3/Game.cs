@@ -75,6 +75,13 @@ namespace TicTacToe.Game._3x3
         public void StartGame()
         {
             IsRunning = true;
+
+            if (_players.Count != 2)
+                throw new Exception("Не назначено 2 игрока.");
+
+            if (_players.First().StepType == _players.Last().StepType)
+                throw new Exception("Игрокам должны быть назначены разные типы ходов.");
+
             new Thread(() =>
             {
                 try

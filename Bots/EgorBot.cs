@@ -9,14 +9,21 @@ namespace Bots
 {
     public class EgorBot : IPlayer
     {
-        public string Name { get; }
-        public StepType StepType { get; }
+        public string Name { get; private set; }
+        public StepType StepType { get; set; }
+        public bool IsPlaying { get; private set; }
+
         public void BeginGame(IGame game)
         {
             throw new NotImplementedException();
         }
 
         public IStep MakeStep()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ClearGame()
         {
             throw new NotImplementedException();
         }

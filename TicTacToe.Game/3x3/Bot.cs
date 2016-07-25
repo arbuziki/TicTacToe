@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Odbc;
 using System.Diagnostics;
 using System.Diagnostics.Eventing.Reader;
 using System.Linq;
@@ -13,22 +14,47 @@ namespace TicTacToe.Game._3x3
     {
         private IGame _game;
 
+        private bool _swapAlgorithm;
+
         private Random _random = new Random();
 
+        private StepType _stepType;
+
         public string Name { get; private set; }
-        public StepType StepType { get; private set; }
+
+        public StepType StepType
+        {
+            get { return _stepType; }
+            set
+            {
+                if (IsPlaying)
+                    throw new Exception("Нельзя менять тип хода во время игры.");
+
+                _stepType = value;
+            }
+        }
+
+        public bool IsPlaying { get; private set; }
 
         public IGame Game { get; set; }
 
-        public Bot(string name, StepType stepType)
+
+        public Bot(string name)
         {
             Name = name;
-            StepType = stepType;
         }
 
         public void BeginGame(IGame game)
         {
             _game = game;
+            IsPlaying = true;
+        }
+
+        public void ClearGame()
+        {
+            _game = null;
+            IsPlaying = false;
+            _swapAlgorithm = false;
         }
 
         public IStep MakeStep()
@@ -42,7 +68,24 @@ namespace TicTacToe.Game._3x3
             if (_game.StepsCount >= 9)
                 throw new Exception("Свободные клетки закончились");
 
-            return StepType == StepType.X ? ProcessX() : ProcessO();
+            if (_game.StepsCount == 0 && StepType == StepType.O)
+            {
+                //Если так вышло, что мы ходим первыми, но почему-то ставим нолики, то меняем алгоритмы.
+                _swapAlgorithm = true;
+                Debugger.Break();
+            }
+
+            if ((_game.StepsCount % 2) == 0 && StepType != StepType.X)
+            {
+                throw new Exception("Крестики должны ходить первыми.");
+            }
+
+            if ((_game.StepsCount % 2) != 0 && StepType != StepType.O)
+            {
+                throw new Exception("Нолики должны ходить вторыми.");
+            }
+
+            return StepType == StepType.X && !_swapAlgorithm ? ProcessX() : ProcessO();
         }
 
         /// <summary>
@@ -51,6 +94,11 @@ namespace TicTacToe.Game._3x3
         /// <returns></returns>
         private IStep ProcessX()
         {
+            //Небольшая вариативность :)
+            if (_game.StepsCount == 0)
+            {
+                return _random.Next(0, 3) == 2 ? StepInRandomCorner() : StepInCenter();
+            }
 
             IStep result = StepInWinCell();
 
@@ -78,13 +126,64 @@ namespace TicTacToe.Game._3x3
             return result;
         }
 
+        private bool _easyAlgorithm;
+
         /// <summary>
         /// Алгоритм за нолики.
         /// </summary>
         /// <returns></returns>
         private IStep ProcessO()
         {
-            throw new NotImplementedException();
+            IStep result = null;
+
+            if (_game.StepsCount == 1)
+            {
+                var enemyStep = _game.History.Single();
+
+                //Если первый ход был сделан в центр, то будет простой алгоритм (нолики ставим в углы, а если это не 
+                _easyAlgorithm = enemyStep.X == 1 && enemyStep.Y == 1;
+
+                if (_easyAlgorithm)
+                {
+                    return StepInRandomCorner();
+                }
+            }
+
+            result = StepInWinCell();
+
+            if (result != null)
+                return result;
+
+            result = StepInDangerCell();
+
+            if (result != null)
+                return result;
+
+            if (_easyAlgorithm)
+            {
+                result = StepInRandomCorner();
+
+                if (result != null)
+                    return result;
+
+                result = StepInRandomCell();
+            }
+            else
+            {
+                result = StepInCenter();
+
+                if (result != null)
+                    return result;
+
+                result = StepInRandomCorner();
+
+                if (result != null)
+                    return result;
+
+                result = StepInRandomCell();
+            }
+
+            return result;
         }
 
         private IStep StepInWinCell()

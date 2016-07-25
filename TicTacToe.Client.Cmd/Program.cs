@@ -19,6 +19,10 @@ namespace TicTacToe.Client.Cmd
 
             CmdGame game = new CmdGame(new GameManager());
 
+            game.ReqisterPlayer(new UserPlayer("Человек"));
+            //Здесь можно поменять алгоритм игры (он должен быть наследован от IPlayer)
+            game.ReqisterPlayer(new Bot("Бот"));
+
             game.Run();
 
             Console.WriteLine("Нажмите любую клавишу для выхода.");

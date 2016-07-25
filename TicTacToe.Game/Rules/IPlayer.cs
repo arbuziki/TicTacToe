@@ -3,10 +3,12 @@
     public interface IPlayer
     {
         string Name { get; }
+        StepType StepType { get; set; }
 
-        StepType StepType { get; }
+        bool IsPlaying { get; }
 
         void BeginGame(IGame game);
         IStep MakeStep();
+        void ClearGame();
     }
 }

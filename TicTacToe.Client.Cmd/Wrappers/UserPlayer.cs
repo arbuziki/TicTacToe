@@ -10,20 +10,27 @@ namespace TicTacToe.Client.Cmd.Wrappers
         private IGame _game;
 
         public string Name { get; private set; }
-        public StepType StepType { get; private set; }
+        public StepType StepType { get; set; }
 
-        public UserPlayer(string name, StepType stepType)
+        public bool IsPlaying { get; private set; }
+
+        public UserPlayer(string name)
         {
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException("name");
 
             Name = name;
-            StepType = stepType;
         }
 
         public void BeginGame(IGame game)
         {
             _game = game;
+            IsPlaying = false;
+        }
+
+        public void ClearGame()
+        {
+            IsPlaying = false;
         }
 
         public IStep MakeStep()
