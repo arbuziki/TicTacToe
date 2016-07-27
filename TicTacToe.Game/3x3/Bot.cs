@@ -99,12 +99,6 @@ namespace TicTacToe.Game._3x3
         /// <returns></returns>
         private IStep ProcessX()
         {
-            //Небольшая вариативность :)
-            if (_game.StepsCount == 0)
-            {
-                return _random.Next(0, 3) == 2 ? StepInRandomCorner() : StepInCenter();
-            }
-
             IStep result = StepInWinCell();
 
             if (result != null)
@@ -120,7 +114,32 @@ namespace TicTacToe.Game._3x3
 
             if (result != null)
                 return result;
-            //Если он занят - в случайный угол
+
+            if (_game.History.Count(T => T.Player != this) == 1)
+            {
+                var enemyStep = _game.History.Single(T => T.Player != this);
+
+                if (enemyStep.X != 1 && enemyStep.Y != 1)
+                    return new Step(2 - enemyStep.X, 2 - enemyStep.Y, this);
+
+                int x = 1, y = 1;
+
+                if (enemyStep.X == 1)
+                {
+                    x = _random.Next(0, 2) == 1 ? 2 : 0;
+                    y = 2 - enemyStep.Y;
+                }
+
+                if (enemyStep.Y == 1)
+                {
+                    x = 2 - enemyStep.X;
+                    y = _random.Next(0, 2) == 1 ? 2 : 0;
+                }
+
+                if (!_game.Field[x, y].HasValue)
+                    return new Step(x, y, this);
+            }
+
             result = StepInRandomCorner();
 
             if (result != null)
@@ -145,12 +164,16 @@ namespace TicTacToe.Game._3x3
             {
                 var enemyStep = _game.History.Single();
 
-                //Если первый ход был сделан в центр, то будет простой алгоритм (нолики ставим в углы, а если это не 
+                //Если первый ход был сделан в центр, то будет простой алгоритм (нолики ставим в углы, а если это не возможно - в любую клетку)
                 _easyAlgorithm = enemyStep.X == 1 && enemyStep.Y == 1;
 
                 if (_easyAlgorithm)
                 {
                     return StepInRandomCorner();
+                }
+                else
+                {
+                    return StepInCenter();
                 }
             }
 
@@ -175,15 +198,32 @@ namespace TicTacToe.Game._3x3
             }
             else
             {
-                result = StepInCenter();
+                if (_game.History.Count(T => T.Player == this) == 1)
+                {
+                    var enemyStep = _game.History.FirstOrDefault(T => T.Player != this);
 
-                if (result != null)
-                    return result;
+                    if (enemyStep.X == 1)
+                    {
+                        return new Step(_random.Next(0, 2) == 1 ? 2 : 0, enemyStep.Y, this);
+                    }
 
-                result = StepInRandomCorner();
+                    if (enemyStep.Y == 1)
+                    {
+                        return new Step(enemyStep.X, _random.Next(0, 2) == 1 ? 2 : 0, this);
+                    }
 
-                if (result != null)
-                    return result;
+                    int x = _random.Next(0, 2) == 1 ? 2 : 0;
+                    int y = _random.Next(0, 2) == 1 ? 2 : 0;
+
+                    if (_random.Next(0, 2) == 1)
+                        x = 1;
+                    else
+                    {
+                        y = 1;
+                    }
+
+                    return new Step(x, y, this);
+                }
 
                 result = StepInRandomCell();
             }
